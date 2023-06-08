@@ -1,0 +1,16 @@
+$zone = ""          ###########Dns zone name###################
+$dnsserver = ""     ###########Dns Server ip###################
+$statementip = ""   ###########Ip statement  whcih you want to change###############
+$newip = ""         ###########New IP address#########################
+
+
+$OldADNS = Get-DnsServerResourceRecord -ComputerName $dnsserver  -ZoneName $zone | where-object {$_.RecordData.ipv4address -eq $statementip}
+foreach ($record in $OldADNS){
+         $NewADNS = Get-DnsServerResourceRecord -ComputerName $dnsserver  -ZoneName $zone | where-object {$_.RecordData.ipv4address -eq $statementip}
+         foreach ($newrecord in $NewADNS){
+                if ($record.HostName -eq $newrecord.HostName){
+                  $newrecord.RecordData.IPv4Address = [ipaddress]$newip
+                  Set-DnsServerResourceRecord -NewInputObject $newrecord -OldInputObject $record -ZoneName $zone -ComputerName $dnsserver
+         }
+        }
+        }
